@@ -42,4 +42,4 @@ process.on('SIGTERM', () => {
   });
 });
 
-require('./travlr');
+require('./models/travlr');
