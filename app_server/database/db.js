@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const host = process.env.DB_HOST || '127.0.0.1'
-let dbURI = 'mongodb://${host}/travlr';
+let dbURI = `mongodb://${host}/travlr`;
 if (process.env.NODE_ENV === 'production') {
   dbURI = process.env.MONGODB_URI;
 }
-mongoose.connect(dbURI);
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+
 
 mongoose.connection.on('connected', () => {
   console.log(`Mongoose connected to ${dbURI}`);
@@ -42,4 +43,4 @@ process.on('SIGTERM', () => {
   });
 });
 
-require('./models/travlr');
+require('../../app_api/models/travlr');
