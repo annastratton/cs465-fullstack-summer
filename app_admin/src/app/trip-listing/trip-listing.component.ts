@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { trips } from '../data/trips';
+import {Router } from '@angular/router';
 
 @Component({
   selector: 'app-trip-listing',
@@ -12,7 +13,13 @@ export class TripListingComponent implements OnInit {
 
   message: string;
 
-  constructor() { }
+  constructor( 
+    private router: Router
+  ){}
+
+  private addTrip(): void {
+    this.router.navigate(['add-trip']);
+  }
 
   ngOnInit(): void {
     this.loadTrips();

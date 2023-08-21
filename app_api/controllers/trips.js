@@ -1,49 +1,76 @@
 const mongoose = require('mongoose');
 const Model = mongoose.model('trips');
 
-//get /trips -lists all the trips 
-const tripsList = async (req,res) => {
+const tripsList = async (req, res) => {
     Model
-    .find({}) //empty filter for all 
-    .exec((err,trips) => {
-        if(!trips){
+    .find({})
+    .exec((err, trips) => {
+        if (err || !trips) {
             return res
                 .status(404)
-                .json({ "message" : "trips not found"});
-        } else if (err) {
-            return res
-                .status(404)
-                .json(err);
-        } else {
-            return res
-                .status(200)
-                .json(trips);
+                .json(err || { "message" : "trips not found"});
         }
+        return res
+            .status(200)
+            .json(trips);
     });
 };
 
-//get /trips /tripcode -returns a single trip
-const tripsFindByCode = async (req,res) => {
+const tripsFindByCode = async (req, res) => {
     Model
-        .find({ 'code': req.params.tripCode })
-        .exec((err, trip) => {
-            if (!trip) {
-                return res
-                    .status(404)
-                    .json({"message": "trip not found"});
-            } else if (err) {
+    .find({ 'code': req.params.tripCode })
+    .exec((err, trip) => {
+        if (err || !trip) {
             return res
                 .status(404)
-                .json(err);
-        } else {
-            return res
-                .status(200)
-                .json(trip);
+                .json(err || { "message" : "trip not found"});
         }
+        return res
+            .status(200)
+            .json(trip);
+    });
+};
+
+const tripsAddTrip = async (req, res) => {
+    Model
+    .create(req.body, (err, trip) => {
+        if (err || !trip) {
+            return res
+                .status(404)
+                .json(err || { "message" : "trip not found"});
+        }
+        return res
+            .status(201)
+            .json(trip);
+    });
+};
+
+const tripsUpdateTrip = async (req, res) => {
+    Model
+    .findOneAndUpdate({ 'code': req.params.tripCode }, req.body, { new: true })
+    .then(trip => {
+        if (!trip) {
+            return res
+                .status(404)
+                .send({ "message" : "Trip not found with code " + req.params.tripCode });
+        }
+        return res.send(trip);
+    })
+    .catch(err => {
+        if (err.kind === 'ObjectId') {
+            return res
+                .status(404)
+                .send({ "message" : "Trip not found with code " + req.params.tripCode });
+        }
+        return res
+            .status(500)
+            .json(err);
     });
 };
 
 module.exports = {
     tripsList,
-    tripsFindByCode
+    tripsFindByCode,
+    tripsAddTrip,
+    tripsUpdateTrip
 };
